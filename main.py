@@ -5,7 +5,7 @@ import argparse
 from graph import Graph
 
 
-def main():
+def read_args():
     parser = argparse.ArgumentParser(description='Generate graphs and search through them.')
     subparsers = parser.add_subparsers(help='commands')
 
@@ -15,18 +15,34 @@ def main():
     generate_parser.add_argument('-x', type=int, metavar='<count>', required=True, help='maximum amount of neighbours')
 
     draw_parser = subparsers.add_parser('draw', help='draw current graph')
+    draw_parser.add_argument('-m', type=str, metavar='<name>', required=True, help='name of graph')
 
     search_parser = subparsers.add_parser('search', help='search in current graph')
 
     args = parser.parse_args()
+    if not vars(args):
+        parser.parse_args(['-h'])
+
+    return args
+
+
+def main():
+    # TODO: implement logger (?)
+    args = read_args()
 
     try:
         if args.v and args.n and args.x:
-            graph = Graph(args.v, args.n, args.x)
+            Graph(args.v, args.n, args.x)
+            return
     except AttributeError:
         pass
 
-    # TODO: implement draw
+    try:
+        if args.m:
+            Graph().draw()
+            return
+    except AttributeError:
+        pass
 
     # TODO: implement search
 
