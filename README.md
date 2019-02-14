@@ -1,4 +1,4 @@
-# Graph theory first task
+# Graph theory course project
 
 Program for graph generation and simple search through graph.
 
