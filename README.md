@@ -4,33 +4,23 @@ Program for graph generation and simple search through graph.
 
 ## Getting Started
 
-# TODO
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project and allow you to run it.
 
 ### Prerequisites
 
-# TODO
-What things you need to install the software and how to install them
+Things you need to install before using this program:
 
 ```
-Give examples
+pip install matplotlib
+pip install networkx
 ```
 
 ### Installing
 
-# TODO
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
+To see full command list run:
 
 ```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+./main
 ```
 
 End with an example of getting some data out of the system or using it for a little demo
