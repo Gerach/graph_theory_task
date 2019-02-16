@@ -34,17 +34,12 @@ def main():
         if args.v and args.n and args.x:
             Graph(args.v, args.n, args.x)
             return
-    except AttributeError:
-        pass
-
-    try:
-        if args.m:
+        elif args.m:
             Graph().draw()
             return
+        # TODO: implement search
     except AttributeError:
         pass
-
-    # TODO: implement search
 
 
 if __name__ == '__main__':
