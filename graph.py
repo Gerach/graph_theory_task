@@ -26,15 +26,14 @@ class Graph:
 
         # read graph from file, exception if something goes wrong
 
-    # return: is_valid, to_insert
     def is_valid_edge(self, st_vertex, nd_vertex):
         if st_vertex == nd_vertex:
-            return False, False
+            return False
         if (st_vertex, nd_vertex) in self.edge_list:
-            return False, False
+            return False
         if (nd_vertex, st_vertex) in self.edge_list:
-            return True, False
-        return True, True
+            return False
+        return True
 
     def count_nbr_edges(self, nbr_id):
         nbr_count = 0
@@ -45,18 +44,20 @@ class Graph:
 
     def generate_edge_list(self):
         for vertex_id in range(self.vertices_amount):
-            nbr_amount = random.randrange(self.nbr_min, self.nbr_max + 1)
+            cur_vertex_nbrs = self.count_nbr_edges(vertex_id)
+            nbr_amount = random.randrange(self.nbr_min, self.nbr_max + 1) - cur_vertex_nbrs
+
             for nbr in range(nbr_amount):
                 valid_nbr = False
-                to_insert = False
                 random_nbr_id = None
+
                 while not valid_nbr:
                     random_nbr_id = random.randrange(self.vertices_amount)
-                    valid_nbr, to_insert = self.is_valid_edge(vertex_id, random_nbr_id)
+                    valid_nbr = self.is_valid_edge(vertex_id, random_nbr_id)
                 if self.count_nbr_edges(random_nbr_id) >= self.nbr_max:
                     continue
-                if to_insert:
-                    self.edge_list.append((vertex_id, random_nbr_id))
+                self.edge_list.append((vertex_id, random_nbr_id))
+
         for edge in self.edge_list:
             print(edge)
         # TODO: implement graph generation
