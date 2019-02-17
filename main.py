@@ -33,6 +33,11 @@ def main():
 
     try:
         if args.v and args.n and args.x:
+            if args.n >= args.v:
+                print('Invalid input data.')
+                return
+            if args.x >= args.v:
+                args.x = args.v - 1
             graph = Graph(args.v, args.n, args.x)
             if args.t:
                 print('Graph generated in {} seconds.'.format(graph.graph_generation_time))
