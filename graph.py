@@ -11,9 +11,6 @@ from edge_list import EdgeList
 
 class Graph:
     def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None):
-        # self.vertices = ['a', 'b', 'c', 1, 2, 'd', 'e']
-        # self.edges = [('a', 'b'), ('a', 'c'), ('a', 1), ('a', 2), ('c', 'd'), (1, 2), (1, 'd'), ('d', 'e')]
-
         self.graph = EdgeList()
 
         self.vertices_amount = vertices_amount
@@ -40,7 +37,7 @@ class Graph:
             for vertex in range(self.vertices_amount):
                 src_vertex_nbrs = self.graph.count_nbrs(vertex)
 
-                if self.nbr_min <= src_vertex_nbrs <= self.nbr_max:
+                if src_vertex_nbrs >= self.nbr_max:
                     continue
 
                 while True:
