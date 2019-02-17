@@ -21,9 +21,12 @@ class Graph:
 
         if self.vertices_amount and self.nbr_min and self.nbr_max:
             start_time = time.process_time()
-            self.generate_graph()
-            for edge in self.graph.edges:
-                print(edge)
+            while True:
+                self.generate_graph()
+                for edge in self.graph.edges:
+                    print(edge)
+                if self.is_whole():
+                    break
             end_time = time.process_time()
             self.graph_generation_time = end_time - start_time
             # self.draw()
