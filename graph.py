@@ -32,6 +32,22 @@ class Graph:
 
         # read graph from file, exception if something goes wrong
 
+    def is_whole(self):
+        all_vertices = self.graph.get_vertices()
+        connected_vertices = [all_vertices[0]]
+
+        for vertex in connected_vertices:
+            for edge in self.graph.edges:
+                if vertex == edge[0] and edge[1] not in connected_vertices:
+                    connected_vertices.append(edge[1])
+                elif vertex == edge[1] and edge[0] not in connected_vertices:
+                    connected_vertices.append(edge[0])
+
+        if sorted(connected_vertices) == sorted(all_vertices):
+            return True
+
+        return False
+
     def generate_graph(self):
         if isinstance(self.graph, EdgeList):
             for vertex in range(self.vertices_amount):

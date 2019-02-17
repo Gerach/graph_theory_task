@@ -17,7 +17,9 @@ class UnitTests:
             nbrs_max = random.randrange(5, 10)
 
             graph = Graph(vertices, nbrs_min, nbrs_max)
-
-            self.tests_passed += 1
+            if graph.is_whole():
+                self.tests_passed += 1
+            else:
+                self.tests_failed += 1
 
         return

@@ -7,6 +7,8 @@ from unit_tests import UnitTests
 
 
 def generate(args):
+    # TODO: additional input checks
+    # TODO: oriented/non oriented/weighted graphs
     if args.v and args.n and args.x:
         if args.n >= args.v:
             print('Invalid input data.')
