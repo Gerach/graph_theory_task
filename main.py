@@ -32,7 +32,8 @@ def main():
 
     try:
         if args.v and args.n and args.x:
-            Graph(args.v, args.n, args.x)
+            graph = Graph(args.v, args.n, args.x)
+            print('Graph generated in {} seconds.'.format(graph.graph_generation_time))
             return
         elif args.m:
             Graph().draw()

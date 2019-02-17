@@ -4,6 +4,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import random
+import time
 
 
 class Graph:
@@ -19,9 +20,14 @@ class Graph:
         self.nbr_min = neighbours_min
         self.nbr_max = neighbours_max
 
+        self.graph_generation_time = None
+
         if self.vertices_amount and self.nbr_min and self.nbr_max:
+            start_time = time.process_time()
             self.generate_edge_list()
-            # write it to file
+            end_time = time.process_time()
+            self.graph_generation_time = end_time - start_time
+            # dump graph to file
             return
 
         # read graph from file, exception if something goes wrong
