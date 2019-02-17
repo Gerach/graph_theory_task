@@ -4,7 +4,9 @@ Program for graph generation and simple search through graph.
 
 ## Getting Started
 
-These instructions will get you a copy of the project and allow you to run it.
+```
+$ git clone https://github.com/Gerach/graph_theory_task.git
+```
 
 ### Prerequisites
 

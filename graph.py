@@ -26,7 +26,7 @@ class Graph:
                 print(edge)
             end_time = time.process_time()
             self.graph_generation_time = end_time - start_time
-            self.draw()
+            # self.draw()
             # dump graph to file
             return
 
@@ -41,7 +41,7 @@ class Graph:
                     continue
 
                 while True:
-                    random_vertex = random.randrange(self.nbr_min, self.nbr_max + 1)
+                    random_vertex = random.randrange(self.vertices_amount)
                     if random_vertex == vertex:
                         continue
                     dst_vertex_nbrs = self.graph.count_nbrs(random_vertex)
