@@ -7,11 +7,13 @@ import random
 import time
 
 from edge_list import EdgeList
+from graph_io import GraphIO
 
 
 class Graph:
-    def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None):
+    def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None, print_to_stdout=False):
         self.graph = EdgeList()
+        self.graph_io = GraphIO()
 
         self.vertices_amount = vertices_amount
         self.nbr_min = neighbours_min
@@ -23,17 +25,17 @@ class Graph:
             start_time = time.process_time()
             while True:
                 self.generate_graph()
-                for edge in self.graph.edges:
-                    print(edge)
+                if print_to_stdout:
+                    for edge in self.graph.edges:
+                        print(edge)
                 if self.is_whole():
+                    self.graph_io.dump(self.graph)
                     break
             end_time = time.process_time()
             self.graph_generation_time = end_time - start_time
-            # self.draw()
-            # dump graph to file
             return
 
-        # read graph from file, exception if something goes wrong
+        self.graph = self.graph_io.load()
 
     def is_whole(self):
         all_vertices = self.graph.get_vertices()

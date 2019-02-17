@@ -21,5 +21,3 @@ class UnitTests:
                 self.tests_passed += 1
             else:
                 self.tests_failed += 1
-
-        return
