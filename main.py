@@ -17,9 +17,9 @@ def generate(args):
         if args.x >= args.v:
             args.x = args.v - 1
         graph = Graph(args.v, args.n, args.x, args.p)
-        graph.generate()
-        # if args.t:
-        #     print('Graph generated in {} seconds.'.format(graph.graph_generation_time))
+        completion_time = graph.generate()
+        if args.t:
+            print('Graph generated in {} seconds.'.format(completion_time))
 
 
 def draw():
