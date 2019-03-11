@@ -53,6 +53,7 @@ class Graph:
 
         return False
 
+    # TODO: fix bug where not enough vertices are connected (-v 20 -n 3 -x 4)
     def generate_graph(self):
         if isinstance(self.graph, EdgeList):
             for vertex in range(self.vertices_amount):
