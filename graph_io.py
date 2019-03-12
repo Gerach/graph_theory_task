@@ -7,8 +7,12 @@ class GraphIO:
     def __init__(self, filename='graph.data'):
         self.filename = filename
 
-    def dump(self, adjacencies):
+    def dump(self, is_digraph, adjacencies):
         with open(self.filename, 'w') as file:
+            if is_digraph:
+                file.write('is digraph\n')
+            else:
+                file.write('\n')
             for adjacency in adjacencies[:-1]:
                 vertices = adjacency.print()
                 for vertex in vertices[:-1]:
@@ -21,8 +25,10 @@ class GraphIO:
         adjacencies_formatted = []
 
         with open(self.filename, 'r') as file:
-            adjacencies = file.readlines()
-            for adjacency in adjacencies:
+            lines = file.readlines()
+            is_digraph = bool(lines[0].strip())
+
+            for adjacency in lines[1:]:
                 vertices = adjacency.strip().split(' ')
                 vertices_list = []
 
@@ -42,4 +48,4 @@ class GraphIO:
 
                 adjacencies_formatted.append(adjacency_formatted)
 
-        return adjacencies_formatted
+        return is_digraph, adjacencies_formatted

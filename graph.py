@@ -122,22 +122,26 @@ class Graph:
                 if valid_neighbour:
                     random_nbr_id = self.get_vertex_id(random_neighbour)
                     self.adjacencies[i].insert(random_neighbour)
-                    self.adjacencies[random_nbr_id].insert(vertex)
+                    if not self.is_digraph:
+                        self.adjacencies[random_nbr_id].insert(vertex)
 
         if self.print_to_stdout:
             for adjacency in self.adjacencies:
                 print(adjacency.print())
 
         end_time = time.process_time()
-        self.graph_io.dump(self.adjacencies)
+        self.graph_io.dump(self.is_digraph, self.adjacencies)
 
         return end_time - start_time
 
     def load(self):
-        self.adjacencies = self.graph_io.load()
+        self.is_digraph, self.adjacencies = self.graph_io.load()
 
     def draw(self):
-        graph = nx.Graph()
+        if self.is_digraph:
+            graph = nx.DiGraph()
+        else:
+            graph = nx.Graph()
         vertices = self.get_vertices()
         edges = self.get_edges()
 
