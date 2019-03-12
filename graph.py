@@ -27,11 +27,15 @@ class Graph:
         self.is_digraph = is_digraph
         self.adjacencies = []
         self.graph_io = GraphIO()
-
         self.vertices = []
+
         if vertices_amount:
-            for vertex in list(range(vertices_amount)):
-                self.vertices.append({'name': vertex, 'weight': 1})
+            for name in list(range(vertices_amount)):
+                vertex = {'name': name, 'weight': 1}
+                self.vertices.append(vertex)
+                adjacency = LinkedList(vertex)
+                adjacency.insert(vertex)
+                self.adjacencies.append(adjacency)
 
     def get_vertices(self):
         all_vertices = []
@@ -59,12 +63,17 @@ class Graph:
 
         return edges
 
+    def get_vertex_id(self, name):
+        for i, vertex in enumerate(self.vertices):
+            if vertex == name:
+                return i
+
+        return None
+
     def generate(self):
         start_time = time.process_time()
 
-        for vertex in self.vertices:
-            adjacency = LinkedList(vertex)
-            adjacency.insert(vertex)
+        for i, vertex in enumerate(self.vertices):
             added_neighbours = [vertex]
 
             if vertex['name'] == 0:
@@ -72,7 +81,7 @@ class Graph:
             else:
                 slice_end = vertex['name']
 
-            while not (adjacency.size() > self.neighbours_min):
+            while not (self.adjacencies[i].size() > self.neighbours_min):
                 current_neighbours = 0
 
                 for walked_vertex in self.vertices[:slice_end]:
@@ -80,7 +89,7 @@ class Graph:
                     if neighbour_to_others:
                         current_neighbours += 1
 
-                current_neighbours += adjacency.size() - 1
+                current_neighbours += self.adjacencies[i].size() - 1
 
                 if current_neighbours >= self.neighbours_max:
                     break
@@ -96,11 +105,10 @@ class Graph:
                 valid_neighbour = True
 
                 if random_neighbour['name'] < vertex['name']:
-                    if not self.is_digraph:
-                        mirrored_neighbour = self.adjacencies[random_neighbour['name']].search(vertex)
                     neighbour_neighbours = self.adjacencies[random_neighbour['name']].size() - 1
 
                 for walked_vertex in self.vertices[:slice_end]:
+                    mirrored_neighbour = self.adjacencies[random_neighbour['name']].search(vertex)
                     neighbour_to_others = self.adjacencies[walked_vertex['name']].search(random_neighbour)
                     if neighbour_to_others:
                         neighbour_occurrences += 1
@@ -110,10 +118,11 @@ class Graph:
                     valid_neighbour = False
 
                 added_neighbours.append(random_neighbour)
-                if valid_neighbour:
-                    adjacency.insert(random_neighbour)
 
-            self.adjacencies.append(adjacency)
+                if valid_neighbour:
+                    random_nbr_id = self.get_vertex_id(random_neighbour)
+                    self.adjacencies[i].insert(random_neighbour)
+                    self.adjacencies[random_nbr_id].insert(vertex)
 
         if self.print_to_stdout:
             for adjacency in self.adjacencies:
