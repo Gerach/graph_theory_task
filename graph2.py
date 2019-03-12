@@ -25,19 +25,22 @@ class Graph:
         self.neighbours_max = neighbours_max
         self.print_to_stdout = print_to_stdout
         self.is_digraph = is_digraph
+        self.adjacencies = []
+        self.graph_io = GraphIO()
 
         self.vertices = []
-        for vertex in list(range(vertices_amount)):
-            self.vertices.append({'name': vertex, 'weight': 1})
-        self.adjacencies = []
+        if vertices_amount:
+            for vertex in list(range(vertices_amount)):
+                self.vertices.append({'name': vertex, 'weight': 1})
 
     def get_vertices(self):
-        vertices = []
+        all_vertices = []
 
-        for vertex in self.vertices:
-            vertices.append(vertex['name'])
+        for adjacency in self.adjacencies:
+            vertices = adjacency.print()
+            all_vertices.append(vertices[-1]['name'])
 
-        return vertices
+        return all_vertices
 
     def get_edges(self):
         edges = []
@@ -117,8 +120,12 @@ class Graph:
                 print(adjacency.print())
 
         end_time = time.process_time()
+        self.graph_io.dump(self.adjacencies)
 
         return end_time - start_time
+
+    def load(self):
+        self.adjacencies = self.graph_io.load()
 
     def draw(self):
         graph = nx.Graph()

@@ -1,25 +1,45 @@
 #!/usr/bin/python3
 
-
-from edge_list import EdgeList
+from linked_list import LinkedList
 
 
 class GraphIO:
     def __init__(self, filename='graph.data'):
         self.filename = filename
 
-    def dump(self, graph):
+    def dump(self, adjacencies):
         with open(self.filename, 'w') as file:
-            for edge in graph.edges:
-                file.write('{}\n'.format(str(edge)))
+            for adjacency in adjacencies[:-1]:
+                vertices = adjacency.print()
+                for vertex in vertices[:-1]:
+                    file.write('{} {} '.format(str(vertex['name']), str(vertex['weight'])))
+                file.write('{} {}\n'.format(str(vertices[-1]['name']), str(vertices[-1]['weight'])))
+            vertices = adjacencies[-1].print()
+            file.write('{} {}'.format(str(vertices[-1]['name']), str(vertices[-1]['weight'])))
 
     def load(self):
-        graph = EdgeList()
-        with open(self.filename, 'r') as file:
-            edges_str = file.readlines()
-            for edge_str in edges_str:
-                st_vertex, nd_vertex = edge_str.strip().strip('(').strip(')').split(', ')
-                edge = (int(st_vertex), int(nd_vertex))
-                graph.append(edge)
+        adjacencies_formatted = []
 
-        return graph
+        with open(self.filename, 'r') as file:
+            adjacencies = file.readlines()
+            for adjacency in adjacencies:
+                vertices = adjacency.strip().split(' ')
+                vertices_list = []
+
+                for i in range(int(len(vertices) / 2)):
+                    name = vertices[i*2]
+                    weight = vertices[i*2 + 1]
+
+                    vertex = {'name': name, 'weight': weight}
+                    vertices_list.append(vertex)
+
+                vertices_list.reverse()
+                adjacency_formatted = LinkedList(vertices_list[0])
+                adjacency_formatted.insert(vertices_list[0])
+
+                for vertex in vertices_list[1:]:
+                    adjacency_formatted.insert(vertex)
+
+                adjacencies_formatted.append(adjacency_formatted)
+
+        return adjacencies_formatted

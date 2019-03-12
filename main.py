@@ -23,7 +23,9 @@ def generate(args):
 
 
 def draw():
-    Graph().draw()
+    graph = Graph()
+    graph.load()
+    graph.draw()
 
 
 def search():
