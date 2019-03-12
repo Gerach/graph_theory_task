@@ -3,7 +3,7 @@
 
 import time
 import argparse
-from graph2 import Graph
+from graph import Graph
 from unit_tests import UnitTests
 
 

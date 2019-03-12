@@ -2,7 +2,7 @@
 
 
 import random
-from graph2 import Graph
+from graph import Graph
 
 
 class UnitTests:

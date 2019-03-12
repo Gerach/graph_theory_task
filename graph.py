@@ -1,88 +1,139 @@
 #!/usr/bin/python3
 
-
 import matplotlib.pyplot as plt
 import networkx as nx
 import random
 import time
 
-from edge_list import EdgeList
+from linked_list import LinkedList
 from graph_io import GraphIO
 
 
+def random_vertex(vertices, except_vertices=None):
+    vertices_cp = vertices.copy()
+
+    for except_vertex in except_vertices:
+        vertices_cp.remove(except_vertex)
+
+    return random.choice(vertices_cp)
+
+
 class Graph:
-    def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None, print_to_stdout=False):
-        self.graph = EdgeList()
+    def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None, print_to_stdout=False,
+                 is_digraph=False):
+        self.neighbours_min = neighbours_min
+        self.neighbours_max = neighbours_max
+        self.print_to_stdout = print_to_stdout
+        self.is_digraph = is_digraph
+        self.adjacencies = []
         self.graph_io = GraphIO()
 
-        self.vertices_amount = vertices_amount
-        self.nbr_min = neighbours_min
-        self.nbr_max = neighbours_max
+        self.vertices = []
+        if vertices_amount:
+            for vertex in list(range(vertices_amount)):
+                self.vertices.append({'name': vertex, 'weight': 1})
 
-        self.graph_generation_time = None
+    def get_vertices(self):
+        all_vertices = []
 
-        if self.vertices_amount and self.nbr_min and self.nbr_max:
-            start_time = time.process_time()
-            while True:
-                self.generate_graph()
-                if print_to_stdout:
-                    for edge in self.graph.edges:
-                        print(edge)
-                if self.is_whole():
-                    self.graph_io.dump(self.graph)
+        for adjacency in self.adjacencies:
+            vertices = adjacency.print()
+            all_vertices.append(vertices[-1]['name'])
+
+        return all_vertices
+
+    def get_edges(self):
+        edges = []
+
+        for adjacency in self.adjacencies:
+            targets = []
+            vertices = adjacency.print()
+
+            for vertex in vertices[:-1]:
+                targets.append(vertex['name'])
+
+            source = vertices[-1]['name']
+
+            for target in targets:
+                edges.append([source, target])
+
+        return edges
+
+    def generate(self):
+        start_time = time.process_time()
+
+        for vertex in self.vertices:
+            adjacency = LinkedList(vertex)
+            adjacency.insert(vertex)
+            added_neighbours = [vertex]
+
+            if vertex['name'] == 0:
+                slice_end = 0
+            else:
+                slice_end = vertex['name']
+
+            while not (adjacency.size() > self.neighbours_min):
+                current_neighbours = 0
+
+                for walked_vertex in self.vertices[:slice_end]:
+                    neighbour_to_others = self.adjacencies[walked_vertex['name']].search(vertex)
+                    if neighbour_to_others:
+                        current_neighbours += 1
+
+                current_neighbours += adjacency.size() - 1
+
+                if current_neighbours >= self.neighbours_max:
                     break
-            end_time = time.process_time()
-            self.graph_generation_time = end_time - start_time
-            return
 
-        self.graph = self.graph_io.load()
+                if len(self.vertices) == len(added_neighbours):
+                    break
 
-    def is_whole(self):
-        all_vertices = self.graph.get_vertices()
-        connected_vertices = [all_vertices[0]]
+                mirrored_neighbour = False
+                neighbour_neighbours = 0
+                neighbour_occurrences = 0
 
-        for vertex in connected_vertices:
-            for edge in self.graph.edges:
-                if vertex == edge[0] and edge[1] not in connected_vertices:
-                    connected_vertices.append(edge[1])
-                elif vertex == edge[1] and edge[0] not in connected_vertices:
-                    connected_vertices.append(edge[0])
+                random_neighbour = random_vertex(self.vertices, added_neighbours)
+                valid_neighbour = True
 
-        if sorted(connected_vertices) == sorted(all_vertices):
-            return True
+                if random_neighbour['name'] < vertex['name']:
+                    if not self.is_digraph:
+                        mirrored_neighbour = self.adjacencies[random_neighbour['name']].search(vertex)
+                    neighbour_neighbours = self.adjacencies[random_neighbour['name']].size() - 1
 
-        return False
+                for walked_vertex in self.vertices[:slice_end]:
+                    neighbour_to_others = self.adjacencies[walked_vertex['name']].search(random_neighbour)
+                    if neighbour_to_others:
+                        neighbour_occurrences += 1
 
-    # TODO: fix bug where not enough vertices are connected (-v 20 -n 3 -x 4)
-    def generate_graph(self):
-        if isinstance(self.graph, EdgeList):
-            for vertex in range(self.vertices_amount):
-                src_vertex_nbrs = self.graph.count_nbrs(vertex)
+                if (mirrored_neighbour
+                        or (neighbour_occurrences + neighbour_neighbours >= self.neighbours_max)):
+                    valid_neighbour = False
 
-                if src_vertex_nbrs >= self.nbr_max:
-                    continue
+                added_neighbours.append(random_neighbour)
+                if valid_neighbour:
+                    adjacency.insert(random_neighbour)
 
-                while True:
-                    random_vertex = random.randrange(self.vertices_amount)
-                    if random_vertex == vertex:
-                        continue
-                    dst_vertex_nbrs = self.graph.count_nbrs(random_vertex)
-                    if dst_vertex_nbrs < self.nbr_max:
-                        break
+            self.adjacencies.append(adjacency)
 
-                generated_edge = (vertex, random_vertex)
-                self.graph.append(generated_edge)
+        if self.print_to_stdout:
+            for adjacency in self.adjacencies:
+                print(adjacency.print())
+
+        end_time = time.process_time()
+        self.graph_io.dump(self.adjacencies)
+
+        return end_time - start_time
+
+    def load(self):
+        self.adjacencies = self.graph_io.load()
 
     def draw(self):
         graph = nx.Graph()
+        vertices = self.get_vertices()
+        edges = self.get_edges()
 
-        graph.add_nodes_from(self.graph.get_vertices())
-        graph.add_edges_from(self.graph.edges)
+        graph.add_nodes_from(vertices)
+        graph.add_edges_from(edges)
 
         nx.draw(graph, with_labels=True)
         plt.show()
-
-    def search(self):
-        # TODO: implement searching through graph
-        # TODO: implement search time monitor
-        return
