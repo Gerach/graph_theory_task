@@ -152,26 +152,23 @@ class Graph:
         nx.draw(graph, with_labels=True)
         plt.show()
 
-    def insert_into_subgraph(self, name):
-        if name not in self.subgraph:
-            self.subgraph.append(name)
-
     def depth_first_search_visit(self, vertex):
         current_vertex_id = None
 
         for i, adjacency in enumerate(self.adjacencies):
-            if vertex == adjacency.get_tail():
+            if vertex['name'] == adjacency.get_tail()['name']:
                 current_vertex_id = i
 
         for adjacency in self.adjacencies:
-            adjacency.color(vertex, 'BLACK')
+            for color in ['WHITE', 'BLACK']:
+                colored_vertex = vertex
+                colored_vertex['color'] = color
+                adjacency.color(colored_vertex, 'BLACK')
 
-        self.adjacencies[current_vertex_id].color(vertex, 'BLACK')
         vertices = self.adjacencies[current_vertex_id].print()
 
         for neighbour in vertices[:-1]:
             if neighbour['color'] == 'WHITE':
-                self.insert_into_subgraph(neighbour['name'])
                 self.depth_first_search_visit(neighbour)
 
     def depth_first_search(self, vertex_name, draw):
@@ -185,13 +182,19 @@ class Graph:
         current_vertex_id = self.get_vertex_id(vertex_name)
         vertex_node = self.adjacencies[current_vertex_id].get_tail()
 
-        self.subgraph = [vertex_name]
         self.depth_first_search_visit(vertex_node)
 
+        for adjacency in self.adjacencies:
+            tail = adjacency.get_tail()
+            if tail['color'] == 'BLACK':
+                self.subgraph.append(adjacency)
+
         if draw:
+            self.adjacencies = self.subgraph
             self.draw()
         else:
-            print(' '.join(self.subgraph))
+            for adjacency in self.subgraph:
+                print(adjacency.print())
 
     def breadth_first_search(self, vertex, draw):
         return
