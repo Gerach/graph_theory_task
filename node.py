@@ -12,5 +12,8 @@ class Node:
     def get_next(self):
         return self.next_node
 
+    def set_data(self, data):
+        self.data = data
+
     def set_next(self, next_node):
         self.next_node = next_node

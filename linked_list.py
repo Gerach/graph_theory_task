@@ -66,3 +66,32 @@ class LinkedList:
             current = current.get_next()
 
         return all_nodes
+
+    def get_tail(self):
+        current = self.head
+
+        while current:
+            if current.get_next() is None:
+                return current.get_data()
+            current = current.get_next()
+
+        raise AttributeError('Tail could not be found')
+
+    def color(self, data, color):
+        current = self.head
+
+        while current:
+            if current.get_data() == data:
+                node = current.get_data()
+                node['color'] = color
+                current.set_data(node)
+            current = current.get_next()
+
+    def color_all(self, color):
+        current = self.head
+
+        while current:
+            node = current.get_data()
+            node['color'] = color
+            current.set_data(node)
+            current = current.get_next()

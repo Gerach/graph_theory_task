@@ -28,9 +28,19 @@ def draw():
     graph.draw()
 
 
-def search():
-    # TODO: implement search
-    return
+def search(args):
+    if args.t == 'dfs':
+        graph = Graph()
+        graph.load()
+        graph.depth_first_search(args.v, args.d)
+    elif args.t == 'bfs':
+        graph = Graph()
+        graph.load()
+        graph.breadth_first_search(args.v, args.d)
+    else:
+        print('"{}" search type is not available. Available types:'.format(args.t))
+        print('dfs')
+        print('bfs')
 
 
 def test_unit(args):
@@ -60,6 +70,9 @@ def read_args():
     draw_parser = subparsers.add_parser('draw', help='draw current graph')
 
     search_parser = subparsers.add_parser('search', help='search in current graph')
+    search_parser.add_argument('-v', type=str, metavar='<vertex>', required=True, help='search from given vertex')
+    search_parser.add_argument('-t', type=str, metavar='<type>', required=True, help='search type')
+    search_parser.add_argument('-d', action='store_true', help='draw subgraph')
 
     tests_parser = subparsers.add_parser('test-unit', help='run unit tests')
     tests_parser.add_argument('-t', action='store_true', help='show completion time')
@@ -73,7 +86,7 @@ def read_args():
         draw()
         return
     elif args.command == 'search':
-        search()
+        search(args)
         return
     elif args.command == 'test-unit':
         test_unit(args)

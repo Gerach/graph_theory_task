@@ -28,6 +28,7 @@ class Graph:
         self.adjacencies = []
         self.graph_io = GraphIO()
         self.vertices = []
+        self.subgraph = []
 
         if vertices_amount:
             for name in list(range(vertices_amount)):
@@ -64,11 +65,11 @@ class Graph:
         return edges
 
     def get_vertex_id(self, name):
-        for i, vertex in enumerate(self.vertices):
+        for i, vertex in enumerate(self.get_vertices()):
             if vertex == name:
                 return i
 
-        return None
+        raise IndexError('Can\'t find index for vertex "{}"'.format(name))
 
     def generate(self):
         start_time = time.process_time()
@@ -150,3 +151,47 @@ class Graph:
 
         nx.draw(graph, with_labels=True)
         plt.show()
+
+    def insert_into_subgraph(self, name):
+        if name not in self.subgraph:
+            self.subgraph.append(name)
+
+    def depth_first_search_visit(self, vertex):
+        current_vertex_id = None
+
+        for i, adjacency in enumerate(self.adjacencies):
+            if vertex == adjacency.get_tail():
+                current_vertex_id = i
+
+        for adjacency in self.adjacencies:
+            adjacency.color(vertex, 'BLACK')
+
+        self.adjacencies[current_vertex_id].color(vertex, 'BLACK')
+        vertices = self.adjacencies[current_vertex_id].print()
+
+        for neighbour in vertices[:-1]:
+            if neighbour['color'] == 'WHITE':
+                self.insert_into_subgraph(neighbour['name'])
+                self.depth_first_search_visit(neighbour)
+
+    def depth_first_search(self, vertex, draw):
+        if vertex not in self.get_vertices():
+            print('Vertex "{}" not found in graph.'.format(vertex))
+            return
+
+        for adjacency in self.adjacencies:
+            adjacency.color_all('WHITE')
+
+        current_vertex_id = self.get_vertex_id(vertex)
+        vertex_node = self.adjacencies[current_vertex_id].get_tail()
+
+        self.subgraph = [vertex]
+        self.depth_first_search_visit(vertex_node)
+
+        if draw:
+            self.draw()
+        else:
+            print(' '.join(self.subgraph))
+
+    def breadth_first_search(self, vertex, draw):
+        return
