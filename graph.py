@@ -64,12 +64,12 @@ class Graph:
 
         return edges
 
-    def get_vertex_id(self, name):
+    def get_vertex_id(self, vertex_name):
         for i, vertex in enumerate(self.get_vertices()):
-            if vertex == name:
+            if vertex == vertex_name:
                 return i
 
-        raise IndexError('Can\'t find index for vertex "{}"'.format(name))
+        raise IndexError('Can\'t find index for vertex "{}"'.format(vertex_name))
 
     def generate(self):
         start_time = time.process_time()
@@ -121,7 +121,7 @@ class Graph:
                 added_neighbours.append(random_neighbour)
 
                 if valid_neighbour:
-                    random_nbr_id = self.get_vertex_id(random_neighbour)
+                    random_nbr_id = self.get_vertex_id(random_neighbour['name'])
                     self.adjacencies[i].insert(random_neighbour)
                     if not self.is_digraph:
                         self.adjacencies[random_nbr_id].insert(vertex)
@@ -174,18 +174,18 @@ class Graph:
                 self.insert_into_subgraph(neighbour['name'])
                 self.depth_first_search_visit(neighbour)
 
-    def depth_first_search(self, vertex, draw):
-        if vertex not in self.get_vertices():
-            print('Vertex "{}" not found in graph.'.format(vertex))
+    def depth_first_search(self, vertex_name, draw):
+        if vertex_name not in self.get_vertices():
+            print('Vertex "{}" not found in graph.'.format(vertex_name))
             return
 
         for adjacency in self.adjacencies:
             adjacency.color_all('WHITE')
 
-        current_vertex_id = self.get_vertex_id(vertex)
+        current_vertex_id = self.get_vertex_id(vertex_name)
         vertex_node = self.adjacencies[current_vertex_id].get_tail()
 
-        self.subgraph = [vertex]
+        self.subgraph = [vertex_name]
         self.depth_first_search_visit(vertex_node)
 
         if draw:
