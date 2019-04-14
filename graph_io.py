@@ -16,10 +16,10 @@ class GraphIO:
             for adjacency in adjacencies[:-1]:
                 vertices = adjacency.print()
                 for vertex in vertices[:-1]:
-                    file.write('{} {} '.format(str(vertex['name']), str(vertex['weight'])))
-                file.write('{} {}\n'.format(str(vertices[-1]['name']), str(vertices[-1]['weight'])))
+                    file.write('{} {} '.format(str(vertex['id']), str(vertex['weight'])))
+                file.write('{} {}\n'.format(str(vertices[-1]['id']), str(vertices[-1]['weight'])))
             vertices = adjacencies[-1].print()
-            file.write('{} {}'.format(str(vertices[-1]['name']), str(vertices[-1]['weight'])))
+            file.write('{} {}'.format(str(vertices[-1]['id']), str(vertices[-1]['weight'])))
 
     def load(self):
         adjacencies_formatted = []
@@ -36,7 +36,7 @@ class GraphIO:
                     name = vertices[i*2]
                     weight = vertices[i*2 + 1]
 
-                    vertex = {'name': name, 'weight': weight}
+                    vertex = {'id': name, 'weight': weight}
                     vertices_list.append(vertex)
 
                 vertices_list.reverse()

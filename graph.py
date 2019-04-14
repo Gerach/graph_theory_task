@@ -20,7 +20,7 @@ def random_vertex(vertices, except_vertices=None):
 
 class Graph:
     def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None, print_to_stdout=False,
-                 is_digraph=False):
+                 is_digraph=False, random_weight=False):
         self.neighbours_min = neighbours_min
         self.neighbours_max = neighbours_max
         self.print_to_stdout = print_to_stdout
@@ -30,9 +30,14 @@ class Graph:
         self.vertices = []
         self.subgraph = []
 
+        if random_weight:
+            self.random_weight = vertices_amount * 5
+        else:
+            self.random_weight = False
+
         if vertices_amount:
-            for name in list(range(vertices_amount)):
-                vertex = {'name': name, 'weight': 1}
+            for vertex_id in range(vertices_amount):
+                vertex = {'id': vertex_id, 'weight': 1}
                 self.vertices.append(vertex)
                 adjacency = LinkedList(vertex)
                 adjacency.insert(vertex)
@@ -43,7 +48,7 @@ class Graph:
 
         for adjacency in self.adjacencies:
             vertices = adjacency.print()
-            all_vertices.append(vertices[-1]['name'])
+            all_vertices.append(vertices[-1]['id'])
 
         return all_vertices
 
@@ -55,9 +60,9 @@ class Graph:
             vertices = adjacency.print()
 
             for vertex in vertices[:-1]:
-                targets.append(vertex['name'])
+                targets.append(vertex['id'])
 
-            source = vertices[-1]['name']
+            source = vertices[-1]['id']
 
             for target in targets:
                 edges.append([source, target])
@@ -77,16 +82,16 @@ class Graph:
         for i, vertex in enumerate(self.vertices):
             added_neighbours = [vertex]
 
-            if vertex['name'] == 0:
+            if vertex['id'] == 0:
                 slice_end = 0
             else:
-                slice_end = vertex['name']
+                slice_end = vertex['id']
 
             while not (self.adjacencies[i].size() > self.neighbours_min):
                 current_neighbours = 0
 
                 for walked_vertex in self.vertices[:slice_end]:
-                    neighbour_to_others = self.adjacencies[walked_vertex['name']].search(vertex)
+                    neighbour_to_others = self.adjacencies[walked_vertex['id']].search(vertex)
                     if neighbour_to_others:
                         current_neighbours += 1
 
@@ -105,12 +110,12 @@ class Graph:
                 random_neighbour = random_vertex(self.vertices, added_neighbours)
                 valid_neighbour = True
 
-                if random_neighbour['name'] < vertex['name']:
-                    neighbour_neighbours = self.adjacencies[random_neighbour['name']].size() - 1
+                if random_neighbour['id'] < vertex['id']:
+                    neighbour_neighbours = self.adjacencies[random_neighbour['id']].size() - 1
 
                 for walked_vertex in self.vertices[:slice_end]:
-                    mirrored_neighbour = self.adjacencies[random_neighbour['name']].search(vertex)
-                    neighbour_to_others = self.adjacencies[walked_vertex['name']].search(random_neighbour)
+                    mirrored_neighbour = self.adjacencies[random_neighbour['id']].search(vertex)
+                    neighbour_to_others = self.adjacencies[walked_vertex['id']].search(random_neighbour)
                     if neighbour_to_others:
                         neighbour_occurrences += 1
 
@@ -121,10 +126,16 @@ class Graph:
                 added_neighbours.append(random_neighbour)
 
                 if valid_neighbour:
-                    random_nbr_id = self.get_vertex_id(random_neighbour['name'])
-                    self.adjacencies[i].insert(random_neighbour)
+                    random_neighbour_cp = random_neighbour.copy()
+                    if self.random_weight:
+                        random_neighbour_cp['weight'] = random.randrange(self.random_weight)
+                    random_nbr_id = self.get_vertex_id(random_neighbour_cp['id'])
+                    self.adjacencies[i].insert(random_neighbour_cp)
                     if not self.is_digraph:
-                        self.adjacencies[random_nbr_id].insert(vertex)
+                        vertex_cp = vertex.copy()
+                        if self.random_weight:
+                            vertex_cp['weight'] = random.randrange(self.random_weight)
+                        self.adjacencies[random_nbr_id].insert(vertex_cp)
 
         if self.print_to_stdout:
             for adjacency in self.adjacencies:
@@ -156,7 +167,7 @@ class Graph:
         current_vertex_id = None
 
         for i, adjacency in enumerate(self.adjacencies):
-            if vertex['name'] == adjacency.get_tail()['name']:
+            if vertex['id'] == adjacency.get_tail()['id']:
                 current_vertex_id = i
 
         for adjacency in self.adjacencies:

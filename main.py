@@ -9,14 +9,13 @@ from unit_tests import UnitTests
 
 def generate(args):
     # TODO: additional input checks
-    # TODO: weighted graphs
     if args.v and args.n and args.x:
         if args.n >= args.v:
             print('Invalid input data.')
             return
         if args.x >= args.v:
             args.x = args.v - 1
-        graph = Graph(args.v, args.n, args.x, args.p, args.d)
+        graph = Graph(args.v, args.n, args.x, args.p, args.d, args.w)
         completion_time = graph.generate()
         if args.t:
             print('Graph generated in {} seconds.'.format(completion_time))
@@ -64,6 +63,7 @@ def read_args():
     generate_parser.add_argument('-n', type=int, metavar='<count>', required=True, help='minimum amount of neighbours')
     generate_parser.add_argument('-x', type=int, metavar='<count>', required=True, help='maximum amount of neighbours')
     generate_parser.add_argument('-d', action='store_true', help='generate digraph')
+    generate_parser.add_argument('-w', action='store_true', help='generate random weights')
     generate_parser.add_argument('-t', action='store_true', help='show completion time')
     generate_parser.add_argument('-p', action='store_true', help='print graph to stdout')
 
