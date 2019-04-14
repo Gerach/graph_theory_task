@@ -21,10 +21,10 @@ def generate(args):
             print('Graph generated in {} seconds.'.format(completion_time))
 
 
-def draw():
+def draw(args):
     graph = Graph()
     graph.load()
-    graph.draw()
+    graph.draw(args.w)
 
 
 def search(args):
@@ -68,6 +68,7 @@ def read_args():
     generate_parser.add_argument('-p', action='store_true', help='print graph to stdout')
 
     draw_parser = subparsers.add_parser('draw', help='draw current graph')
+    draw_parser.add_argument('-w', action='store_true', help='display edge weights')
 
     search_parser = subparsers.add_parser('search', help='search in current graph')
     search_parser.add_argument('-v', type=str, metavar='<vertex>', required=True, help='search from given vertex')
@@ -83,7 +84,7 @@ def read_args():
         generate(args)
         return
     elif args.command == 'draw':
-        draw()
+        draw(args)
         return
     elif args.command == 'search':
         search(args)

@@ -69,6 +69,22 @@ class Graph:
 
         return edges
 
+    def get_edge_weights(self):
+        edge_weights = {}
+
+        for adjacency in self.adjacencies:
+            vertices = adjacency.print()
+            source = vertices[-1]['id']
+
+            for vertex in vertices[:-1]:
+                target = vertex['id']
+                weight = vertex['weight']
+
+                edge_weights[(source, target)] = weight
+
+        return edge_weights
+
+
     def get_vertex_id(self, vertex_name):
         for i, vertex in enumerate(self.get_vertices()):
             if vertex == vertex_name:
@@ -127,16 +143,17 @@ class Graph:
 
                 if valid_neighbour:
                     random_neighbour_cp = random_neighbour.copy()
-                    random_weight = random.randrange(self.generate_random_weight)
-
                     if self.generate_random_weight:
-                        random_neighbour_cp['weight'] = random_weight
+                        random_weight = random.randrange(self.generate_random_weight)
+                    else:
+                        random_weight = 1
+
+                    random_neighbour_cp['weight'] = random_weight
                     random_nbr_id = self.get_vertex_id(random_neighbour_cp['id'])
                     self.adjacencies[i].insert(random_neighbour_cp)
                     if not self.is_digraph:
                         vertex_cp = vertex.copy()
-                        if self.generate_random_weight:
-                            vertex_cp['weight'] = random_weight
+                        vertex_cp['weight'] = random_weight
                         self.adjacencies[random_nbr_id].insert(vertex_cp)
 
         if self.print_to_stdout:
@@ -151,18 +168,25 @@ class Graph:
     def load(self):
         self.is_digraph, self.adjacencies = self.graph_io.load()
 
-    def draw(self):
+    def draw(self, show_weights):
         if self.is_digraph:
             graph = nx.DiGraph()
         else:
             graph = nx.Graph()
+
         vertices = self.get_vertices()
         edges = self.get_edges()
 
         graph.add_nodes_from(vertices)
         graph.add_edges_from(edges)
 
-        nx.draw(graph, with_labels=True)
+        pos = nx.spring_layout(graph)
+
+        nx.draw(graph, pos,  with_labels=True)
+
+        if show_weights:
+            nx.draw_networkx_edge_labels(graph, pos, edge_labels=self.get_edge_weights())
+
         plt.show()
 
     def depth_first_search_visit(self, vertex):
@@ -204,7 +228,7 @@ class Graph:
 
         if draw:
             self.adjacencies = self.subgraph
-            self.draw()
+            self.draw(False)
         else:
             for adjacency in self.subgraph:
                 print(adjacency.print())
