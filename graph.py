@@ -31,9 +31,9 @@ class Graph:
         self.subgraph = []
 
         if random_weight:
-            self.random_weight = vertices_amount * 5
+            self.generate_random_weight = vertices_amount * 5
         else:
-            self.random_weight = False
+            self.generate_random_weight = False
 
         if vertices_amount:
             for vertex_id in range(vertices_amount):
@@ -127,14 +127,16 @@ class Graph:
 
                 if valid_neighbour:
                     random_neighbour_cp = random_neighbour.copy()
-                    if self.random_weight:
-                        random_neighbour_cp['weight'] = random.randrange(self.random_weight)
+                    random_weight = random.randrange(self.generate_random_weight)
+
+                    if self.generate_random_weight:
+                        random_neighbour_cp['weight'] = random_weight
                     random_nbr_id = self.get_vertex_id(random_neighbour_cp['id'])
                     self.adjacencies[i].insert(random_neighbour_cp)
                     if not self.is_digraph:
                         vertex_cp = vertex.copy()
-                        if self.random_weight:
-                            vertex_cp['weight'] = random.randrange(self.random_weight)
+                        if self.generate_random_weight:
+                            vertex_cp['weight'] = random_weight
                         self.adjacencies[random_nbr_id].insert(vertex_cp)
 
         if self.print_to_stdout:
