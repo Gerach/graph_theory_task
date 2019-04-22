@@ -7,6 +7,7 @@ import time
 
 from linked_list import LinkedList
 from graph_io import GraphIO
+from heap import Heap
 
 
 def random_vertex(vertices, except_vertices=None):
@@ -29,6 +30,7 @@ class Graph:
         self.graph_io = GraphIO()
         self.vertices = []
         self.subgraph = []
+        self.heap = []
 
         if random_weight:
             self.generate_random_weight = vertices_amount * 5
@@ -83,7 +85,6 @@ class Graph:
                 edge_weights[(source, target)] = weight
 
         return edge_weights
-
 
     def get_vertex_id(self, vertex_name):
         for i, vertex in enumerate(self.get_vertices()):
@@ -235,3 +236,29 @@ class Graph:
 
     def breadth_first_search(self, vertex, draw):
         return
+
+    def get_heap(self):
+        heap = []
+
+        for adjacency in self.adjacencies:
+            vertices = adjacency.print()
+            source = vertices[-1]['id']
+
+            for vertex in vertices[:-1]:
+                target = vertex['id']
+                weight = vertex['weight']
+
+                node = {'source': source, 'target': target, 'weight': weight}
+                reverse_node = {'source': target, 'target': source, 'weight': weight}
+
+                if node not in heap and reverse_node not in heap:
+                    heap.append(node)
+
+        return heap
+
+    def search_dijkstra(self, node_from, node_to):
+        graph = self.get_heap()
+        heap = Heap().build_min_heap(graph)
+
+        for i in heap:
+            print(i)

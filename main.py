@@ -42,6 +42,12 @@ def search(args):
         print('bfs')
 
 
+def search_dijkstra(args):
+    graph = Graph()
+    graph.load()
+    graph.search_dijkstra(args.f, args.t)
+
+
 def test_unit(args):
     start_time = time.process_time()
     tests = UnitTests()
@@ -75,6 +81,10 @@ def read_args():
     search_parser.add_argument('-t', type=str, metavar='<type>', required=True, help='search type')
     search_parser.add_argument('-d', action='store_true', help='draw subgraph')
 
+    search_dijkstra_parser = subparsers.add_parser('search-dijkstra', help='search in current graph using dijkstra algorithm')
+    search_dijkstra_parser.add_argument('-f', type=str, required=True, help='search from given vertex')
+    search_dijkstra_parser.add_argument('-t', type=str, required=True, help='search to given vertex')
+
     tests_parser = subparsers.add_parser('test-unit', help='run unit tests')
     tests_parser.add_argument('-t', action='store_true', help='show completion time')
 
@@ -88,6 +98,9 @@ def read_args():
         return
     elif args.command == 'search':
         search(args)
+        return
+    elif args.command == 'search-dijkstra':
+        search_dijkstra(args)
         return
     elif args.command == 'test-unit':
         test_unit(args)

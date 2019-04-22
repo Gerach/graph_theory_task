@@ -36,6 +36,7 @@ End with an example of getting some data out of the system or using it for a lit
 ## Built With
 
 * [PYTHON3](https://www.python.org/download/releases/3.0/) - Used to run python code
+* [NETWORKX](https://networkx.github.io/) - Used to display graphs
 
 ## Authors
 

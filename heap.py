@@ -2,8 +2,6 @@
 
 import math
 
-heap = [16, 4, 10, 14, 7, 9, 3, 2, 8, 1]
-
 
 def parent(node_id):
     return math.ceil((node_id - 2) / 2)
@@ -31,12 +29,12 @@ class Heap:
         left_id = left(node_id)
         right_id = right(node_id)
 
-        if left_id < self.heap_size and graph[left_id] > graph[node_id]:
+        if left_id < self.heap_size and int(graph[left_id]['weight']) > int(graph[node_id]['weight']):
             largest_id = left_id
         else:
             largest_id = node_id
 
-        if right_id < self.heap_size and graph[right_id] > graph[largest_id]:
+        if right_id < self.heap_size and int(graph[right_id]['weight']) > int(graph[largest_id]['weight']):
             largest_id = right_id
 
         if largest_id != node_id:
@@ -69,12 +67,12 @@ class Heap:
         left_id = left(node_id)
         right_id = right(node_id)
 
-        if left_id < self.heap_size and graph[left_id] < graph[node_id]:
+        if left_id < self.heap_size and int(graph[left_id]['weight']) < int(graph[node_id]['weight']):
             smallest_id = left_id
         else:
             smallest_id = node_id
 
-        if right_id < self.heap_size and graph[right_id] < graph[smallest_id]:
+        if right_id < self.heap_size and int(graph[right_id]['weight']) < int(graph[smallest_id]['weight']):
             smallest_id = right_id
 
         if smallest_id != node_id:
@@ -90,7 +88,7 @@ class Heap:
         :return:
         """
         self.heap_size = len(graph)
-        middle_id = math.floor(len(graph) / 2)
+        middle_id = math.floor(len(graph) / 2) - 1
 
         for node_id in range(middle_id, -1, -1):
             graph = self.min_heapify(graph, node_id)
@@ -117,7 +115,3 @@ class Heap:
         :return:
         """
         return
-
-
-heap2 = Heap().build_min_heap(heap)
-print(heap2)
