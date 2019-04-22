@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import random
 import time
+import itertools
 
 from linked_list import LinkedList
 from graph_io import GraphIO
@@ -63,6 +64,20 @@ def relax(s_id, t_id, target_weight, initialized_vertices):
         initialized_vertices[t_id]['parent'] = s_id
 
     return initialized_vertices
+
+
+def get_shortest_path_and_length(covering_graph, from_id, to_id):
+    path = ''
+    total_distance = 0
+
+    while to_id != from_id:
+        total_distance += covering_graph[to_id]['distance']
+        path += str(to_id) + ' '
+        to_id = covering_graph[to_id]['parent']
+
+    path += str(to_id)
+
+    return 'Path: ' + path[::-1] + ' Distance: ' + str(total_distance)
 
 
 class Graph:
@@ -304,6 +319,7 @@ class Graph:
 
     def search_dijkstra(self, node_from):
         vertices = self.get_vertices()
+        # TODO (gm): remake to graph?
         heap = self.get_heap()
         # heap = Heap().build_min_heap(heap)
         initialized_vertices = initialize_single_source(vertices, node_from)
@@ -330,7 +346,17 @@ class Graph:
 
             del initialized_vertices[min_distance_vertex_id]
 
-        print(covering_graph)
+        return covering_graph
 
-        for i in heap:
-            print(i)
+    def get_all_shortest_paths(self):
+        covering_graph = None
+        current_id = None
+        vertices_combinations = list(itertools.combinations(self.get_vertices(), 2))
+
+        for combination in vertices_combinations:
+            if combination[0] != current_id:
+                current_id = combination[0]
+                covering_graph = self.search_dijkstra(int(current_id))
+
+            path_and_length = get_shortest_path_and_length(covering_graph, int(combination[0]), int(combination[1]))
+            print(path_and_length)

@@ -8,7 +8,6 @@ from unit_tests import UnitTests
 
 
 def generate(args):
-    # TODO: additional input checks
     if args.v and args.n and args.x:
         if args.n >= args.v:
             print('Invalid input data.')
@@ -42,10 +41,10 @@ def search(args):
         print('bfs')
 
 
-def search_dijkstra(args):
+def search_dijkstra():
     graph = Graph()
     graph.load()
-    graph.search_dijkstra(int(args.f))
+    graph.get_all_shortest_paths()
 
 
 def test_unit(args):
@@ -81,9 +80,10 @@ def read_args():
     search_parser.add_argument('-t', type=str, metavar='<type>', required=True, help='search type')
     search_parser.add_argument('-d', action='store_true', help='draw subgraph')
 
-    search_dijkstra_parser = subparsers.add_parser('search-dijkstra', help='search in current graph using dijkstra algorithm')
-    search_dijkstra_parser.add_argument('-f', type=str, required=True, help='search from given vertex')
-    search_dijkstra_parser.add_argument('-t', type=str, required=True, help='search to given vertex')
+    search_dijkstra_parser = subparsers.add_parser(
+        'search-dijkstra',
+        help='search all shortest paths in current graph using dijkstra algorithm'
+    )
 
     tests_parser = subparsers.add_parser('test-unit', help='run unit tests')
     tests_parser.add_argument('-t', action='store_true', help='show completion time')
@@ -100,7 +100,7 @@ def read_args():
         search(args)
         return
     elif args.command == 'search-dijkstra':
-        search_dijkstra(args)
+        search_dijkstra()
         return
     elif args.command == 'test-unit':
         test_unit(args)
