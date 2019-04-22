@@ -54,7 +54,7 @@ class LinkedList:
         else:
             previous.set_next(current.get_next())
 
-    def print(self):
+    def get(self):
         current = self.head
         all_nodes = []
 

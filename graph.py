@@ -77,7 +77,7 @@ def get_shortest_path_and_length(covering_graph, from_id, to_id):
 
     path += str(to_id)
 
-    return 'Path: ' + path[::-1] + ' Distance: ' + str(total_distance)
+    return path[::-1], total_distance
 
 
 class Graph:
@@ -110,7 +110,7 @@ class Graph:
         all_vertices = []
 
         for adjacency in self.adjacencies:
-            vertices = adjacency.print()
+            vertices = adjacency.get()
             all_vertices.append(vertices[-1]['id'])
 
         return all_vertices
@@ -120,7 +120,7 @@ class Graph:
 
         for adjacency in self.adjacencies:
             targets = []
-            vertices = adjacency.print()
+            vertices = adjacency.get()
 
             for vertex in vertices[:-1]:
                 targets.append(vertex['id'])
@@ -136,7 +136,7 @@ class Graph:
         edge_weights = {}
 
         for adjacency in self.adjacencies:
-            vertices = adjacency.print()
+            vertices = adjacency.get()
             source = vertices[-1]['id']
 
             for vertex in vertices[:-1]:
@@ -220,7 +220,7 @@ class Graph:
 
         if self.print_to_stdout:
             for adjacency in self.adjacencies:
-                print(adjacency.print())
+                print(adjacency.get())
 
         end_time = time.process_time()
         self.graph_io.dump(self.is_digraph, self.adjacencies)
@@ -264,7 +264,7 @@ class Graph:
                 colored_vertex['color'] = color
                 adjacency.color(colored_vertex, 'BLACK')
 
-        vertices = self.adjacencies[current_vertex_id].print()
+        vertices = self.adjacencies[current_vertex_id].get()
 
         for neighbour in vertices[:-1]:
             if neighbour['color'] == 'WHITE':
@@ -293,16 +293,16 @@ class Graph:
             self.draw(False)
         else:
             for adjacency in self.subgraph:
-                print(adjacency.print())
+                print(adjacency.get())
 
     def breadth_first_search(self, vertex, draw):
         return
 
-    def get_heap(self):
+    def get_graph(self):
         heap = []
 
         for adjacency in self.adjacencies:
-            vertices = adjacency.print()
+            vertices = adjacency.get()
             source = vertices[-1]['id']
 
             for vertex in vertices[:-1]:
@@ -319,9 +319,7 @@ class Graph:
 
     def search_dijkstra(self, node_from):
         vertices = self.get_vertices()
-        # TODO (gm): remake to graph?
-        heap = self.get_heap()
-        # heap = Heap().build_min_heap(heap)
+        graph = self.get_graph()
         initialized_vertices = initialize_single_source(vertices, node_from)
 
         covering_graph = {}
@@ -329,7 +327,7 @@ class Graph:
         while initialized_vertices:
             min_distance_vertex_id = extract_min(initialized_vertices)
             covering_graph[min_distance_vertex_id] = initialized_vertices[min_distance_vertex_id]
-            adjacent_vertices = get_adjacent_vertices(heap, initialized_vertices, min_distance_vertex_id)
+            adjacent_vertices = get_adjacent_vertices(graph, initialized_vertices, min_distance_vertex_id)
 
             for edge in adjacent_vertices:
                 if int(edge['source']) == min_distance_vertex_id:
@@ -349,14 +347,22 @@ class Graph:
         return covering_graph
 
     def get_all_shortest_paths(self):
-        covering_graph = None
-        current_id = None
-        vertices_combinations = list(itertools.combinations(self.get_vertices(), 2))
+        vertices = self.get_vertices()
+        heap = []
 
-        for combination in vertices_combinations:
-            if combination[0] != current_id:
-                current_id = combination[0]
-                covering_graph = self.search_dijkstra(int(current_id))
+        for from_vertex in vertices:
+            total_distance = 0
+            covering_graph = self.search_dijkstra(int(from_vertex))
 
-            path_and_length = get_shortest_path_and_length(covering_graph, int(combination[0]), int(combination[1]))
-            print(path_and_length)
+            for to_vertex in vertices:
+                if int(to_vertex) == int(from_vertex):
+                    continue
+
+                path, distance = get_shortest_path_and_length(covering_graph, int(from_vertex), int(to_vertex))
+                total_distance += distance
+
+            heap.append({'id': int(from_vertex), 'total_distance': total_distance})
+
+        heap = Heap().build_min_heap(heap)
+        print(heap)
+        print('Best place to put gaisrine is at node: {}'.format(heap[0]['id']))

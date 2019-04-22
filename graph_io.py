@@ -14,11 +14,11 @@ class GraphIO:
             else:
                 file.write('\n')
             for adjacency in adjacencies[:-1]:
-                vertices = adjacency.print()
+                vertices = adjacency.get()
                 for vertex in vertices[:-1]:
                     file.write('{} {} '.format(str(vertex['id']), str(vertex['weight'])))
                 file.write('{} {}\n'.format(str(vertices[-1]['id']), str(vertices[-1]['weight'])))
-            vertices = adjacencies[-1].print()
+            vertices = adjacencies[-1].get()
             file.write('{} {}'.format(str(vertices[-1]['id']), str(vertices[-1]['weight'])))
 
     def load(self):

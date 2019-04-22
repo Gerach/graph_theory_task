@@ -29,12 +29,12 @@ class Heap:
         left_id = left(node_id)
         right_id = right(node_id)
 
-        if left_id < self.heap_size and int(graph[left_id]['weight']) > int(graph[node_id]['weight']):
+        if left_id < self.heap_size and int(graph[left_id]['total_distance']) > int(graph[node_id]['total_distance']):
             largest_id = left_id
         else:
             largest_id = node_id
 
-        if right_id < self.heap_size and int(graph[right_id]['weight']) > int(graph[largest_id]['weight']):
+        if right_id < self.heap_size and int(graph[right_id]['total_distance']) > int(graph[largest_id]['total_distance']):
             largest_id = right_id
 
         if largest_id != node_id:
@@ -67,12 +67,12 @@ class Heap:
         left_id = left(node_id)
         right_id = right(node_id)
 
-        if left_id < self.heap_size and int(graph[left_id]['weight']) < int(graph[node_id]['weight']):
+        if left_id < self.heap_size and int(graph[left_id]['total_distance']) < int(graph[node_id]['total_distance']):
             smallest_id = left_id
         else:
             smallest_id = node_id
 
-        if right_id < self.heap_size and int(graph[right_id]['weight']) < int(graph[smallest_id]['weight']):
+        if right_id < self.heap_size and int(graph[right_id]['total_distance']) < int(graph[smallest_id]['total_distance']):
             smallest_id = right_id
 
         if smallest_id != node_id:
