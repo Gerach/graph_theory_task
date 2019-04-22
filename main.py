@@ -45,7 +45,7 @@ def search(args):
 def search_dijkstra(args):
     graph = Graph()
     graph.load()
-    graph.search_dijkstra(args.f, args.t)
+    graph.search_dijkstra(int(args.f))
 
 
 def test_unit(args):

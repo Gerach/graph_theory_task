@@ -19,6 +19,52 @@ def random_vertex(vertices, except_vertices=None):
     return random.choice(vertices_cp)
 
 
+def initialize_single_source(vertices, source):
+    initialized_vertices = {}
+
+    for v_id, vertex in enumerate(vertices):
+        if int(vertex) == source:
+            initialized_vertices[v_id] = {'distance': 0, 'parent': None}
+        else:
+            initialized_vertices[v_id] = {'distance': 1000000, 'parent': None}
+
+    return initialized_vertices
+
+
+def extract_min(vertices):
+    min_val = 1000000
+    min_id = None
+
+    for key, vertex in vertices.items():
+        if vertex['distance'] < min_val:
+            min_val = vertex['distance']
+            min_id = key
+
+    return min_id
+
+
+def get_adjacent_vertices(graph, existing_vertices, current_vertex_id):
+    adjacent_vertices = []
+
+    for edge in graph:
+        if int(edge['source']) not in existing_vertices or int(edge['target']) not in existing_vertices:
+            continue
+        if int(edge['source']) == int(current_vertex_id) or int(edge['target']) == int(current_vertex_id):
+            adjacent_vertices.append(edge)
+
+    return adjacent_vertices
+
+
+def relax(s_id, t_id, target_weight, initialized_vertices):
+    target_weight = initialized_vertices[s_id]['distance'] + target_weight
+
+    if target_weight < initialized_vertices[t_id]['distance']:
+        initialized_vertices[t_id]['distance'] = target_weight
+        initialized_vertices[t_id]['parent'] = s_id
+
+    return initialized_vertices
+
+
 class Graph:
     def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None, print_to_stdout=False,
                  is_digraph=False, random_weight=False):
@@ -256,9 +302,35 @@ class Graph:
 
         return heap
 
-    def search_dijkstra(self, node_from, node_to):
-        graph = self.get_heap()
-        heap = Heap().build_min_heap(graph)
+    def search_dijkstra(self, node_from):
+        vertices = self.get_vertices()
+        heap = self.get_heap()
+        # heap = Heap().build_min_heap(heap)
+        initialized_vertices = initialize_single_source(vertices, node_from)
+
+        covering_graph = {}
+
+        while initialized_vertices:
+            min_distance_vertex_id = extract_min(initialized_vertices)
+            covering_graph[min_distance_vertex_id] = initialized_vertices[min_distance_vertex_id]
+            adjacent_vertices = get_adjacent_vertices(heap, initialized_vertices, min_distance_vertex_id)
+
+            for edge in adjacent_vertices:
+                if int(edge['source']) == min_distance_vertex_id:
+                    target_id = int(edge['target'])
+                else:
+                    target_id = int(edge['source'])
+
+                initialized_vertices = relax(
+                    min_distance_vertex_id,
+                    target_id,
+                    int(edge['weight']),
+                    initialized_vertices
+                )
+
+            del initialized_vertices[min_distance_vertex_id]
+
+        print(covering_graph)
 
         for i in heap:
             print(i)
