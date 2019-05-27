@@ -51,7 +51,7 @@ def vertex_cover(args):
     if args.a:
         graph = Graph()
         graph.load()
-        graph.approximate_vertex_cover()
+        graph.approximation_vertex_cover()
         return
     elif args.f:
         graph = Graph()

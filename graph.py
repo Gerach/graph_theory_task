@@ -310,7 +310,23 @@ class Graph:
         print(heap)
         print('Best place to put gaisrine is at node: {}'.format(heap[0]['id']))
 
-    def approximate_vertex_cover(self):
+    def approximation_vertex_cover(self):
         cover = []
-        edges = self.get_edges()
-        return
+        edges = self.get_edges().copy()
+
+        while edges:
+            random_edge = random.choice(edges)
+
+            source = random_edge[0]
+            target = random_edge[1]
+
+            if source not in cover:
+                cover.append(source)
+            if target not in cover:
+                cover.append(target)
+
+            for edge in edges:
+                if source in edge or target in edge:
+                    edges.remove(edge)
+
+        print(cover)
