@@ -84,6 +84,30 @@ def get_shortest_path_and_length(covering_graph, from_id, to_id):
     return path[::-1], total_distance
 
 
+def get_all_combinations(data):
+    if len(data) == 0:
+        return [[]]
+
+    combinations = []
+
+    for combination in get_all_combinations(data[1:]):
+        combinations += [combination, combination+[data[0]]]
+
+    return combinations
+
+
+def is_covering_vertex(edges, vertices):
+    for vertex in vertices:
+        for edge in edges:
+            if vertex in edge or vertex in edge:
+                edges.remove(edge)
+
+    if edges:
+        return False
+
+    return True
+
+
 class Graph:
     def __init__(self, vertices_amount=None, neighbours_min=None, neighbours_max=None, print_to_stdout=False,
                  is_digraph=False, random_weight=False):
@@ -330,3 +354,12 @@ class Graph:
                     edges.remove(edge)
 
         print(cover)
+
+    def brute_force_vertex_cover(self):
+        all_combinations = get_all_combinations(self.vertices)
+        all_combinations.sort(key=len)
+
+        for combination in all_combinations:
+            if is_covering_vertex(self.get_edges(), combination):
+                print(combination)
+                return combination

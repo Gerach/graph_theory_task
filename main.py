@@ -56,7 +56,7 @@ def vertex_cover(args):
     elif args.f:
         graph = Graph()
         graph.load()
-        # brute force
+        graph.brute_force_vertex_cover()
         return
     else:
         print('No algorithm indicated')
