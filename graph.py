@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import datetime
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -97,12 +98,17 @@ def get_all_combinations(data):
 
 
 def is_covering_vertex(edges, vertices):
+    remaining_edges = edges.copy()
+
     for vertex in vertices:
         for edge in edges:
             if vertex in edge or vertex in edge:
-                edges.remove(edge)
+                try:
+                    remaining_edges.remove(edge)
+                except ValueError:
+                    continue
 
-    if edges:
+    if remaining_edges:
         return False
 
     return True
@@ -335,8 +341,9 @@ class Graph:
         print('Best place to put gaisrine is at node: {}'.format(heap[0]['id']))
 
     def approximation_vertex_cover(self):
+        start_time = datetime.datetime.now()
         cover = []
-        edges = self.get_edges().copy()
+        edges = self.get_edges()
 
         while edges:
             random_edge = random.choice(edges)
@@ -353,13 +360,22 @@ class Graph:
                 if source in edge or target in edge:
                     edges.remove(edge)
 
+        end_time = datetime.datetime.now()
+
         print(cover)
+        print('Execution time (miliseconds): {}'.format((end_time - start_time).total_seconds() * 1000))
 
     def brute_force_vertex_cover(self):
+        start_time = datetime.datetime.now()
         all_combinations = get_all_combinations(self.vertices)
         all_combinations.sort(key=len)
 
         for combination in all_combinations:
-            if is_covering_vertex(self.get_edges(), combination):
+            edges = self.get_edges()
+            if is_covering_vertex(edges, combination):
+                end_time = datetime.datetime.now()
+
                 print(combination)
-                return combination
+                print('Execution time (miliseconds): {}'.format((end_time - start_time).total_seconds() * 1000))
+
+                break
