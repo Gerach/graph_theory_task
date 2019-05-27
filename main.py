@@ -47,6 +47,22 @@ def search_dijkstra():
     graph.get_all_shortest_paths()
 
 
+def vertex_cover(args):
+    if args.a:
+        graph = Graph()
+        graph.load()
+        graph.approximate_vertex_cover()
+        return
+    elif args.f:
+        graph = Graph()
+        graph.load()
+        # brute force
+        return
+    else:
+        print('No algorithm indicated')
+        exit(1)
+
+
 def test_unit(args):
     start_time = time.process_time()
     tests = UnitTests()
@@ -85,6 +101,10 @@ def read_args():
         help='search all shortest paths in current graph using dijkstra algorithm'
     )
 
+    vertex_cover_parser = subparsers.add_parser('vertex-cover', help='solve vertex cover task')
+    vertex_cover_parser.add_argument('-a', action='store_true', help='solve using approximate algorithm')
+    vertex_cover_parser.add_argument('-f', action='store_true', help='solve using brute force algorithm')
+
     tests_parser = subparsers.add_parser('test-unit', help='run unit tests')
     tests_parser.add_argument('-t', action='store_true', help='show completion time')
 
@@ -101,6 +121,9 @@ def read_args():
         return
     elif args.command == 'search-dijkstra':
         search_dijkstra()
+        return
+    elif args.command == 'vertex-cover':
+        vertex_cover(args)
         return
     elif args.command == 'test-unit':
         test_unit(args)

@@ -4,9 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import random
 import time
-import itertools
 
-from linked_list import LinkedList
 from graph_io import GraphIO
 from heap import Heap
 
@@ -15,9 +13,15 @@ def random_vertex(vertices, except_vertices=None):
     vertices_cp = vertices.copy()
 
     for except_vertex in except_vertices:
-        vertices_cp.remove(except_vertex)
+        try:
+            vertices_cp.remove(except_vertex)
+        except ValueError:
+            continue
 
-    return random.choice(vertices_cp)
+    if vertices_cp:
+        return random.choice(vertices_cp)
+
+    return None
 
 
 def initialize_single_source(vertices, source):
@@ -100,34 +104,14 @@ class Graph:
 
         if vertices_amount:
             for vertex_id in range(vertices_amount):
-                vertex = {'id': vertex_id, 'weight': 1}
-                self.vertices.append(vertex)
-                adjacency = LinkedList(vertex)
-                adjacency.insert(vertex)
-                self.adjacencies.append(adjacency)
-
-    def get_vertices(self):
-        all_vertices = []
-
-        for adjacency in self.adjacencies:
-            vertices = adjacency.get()
-            all_vertices.append(vertices[-1]['id'])
-
-        return all_vertices
+                self.vertices.append(vertex_id)
+                self.adjacencies.append([])
 
     def get_edges(self):
         edges = []
 
-        for adjacency in self.adjacencies:
-            targets = []
-            vertices = adjacency.get()
-
-            for vertex in vertices[:-1]:
-                targets.append(vertex['id'])
-
-            source = vertices[-1]['id']
-
-            for target in targets:
+        for source, nbrs in enumerate(self.adjacencies):
+            for target in nbrs:
                 edges.append([source, target])
 
         return edges
@@ -148,7 +132,7 @@ class Graph:
         return edge_weights
 
     def get_vertex_id(self, vertex_name):
-        for i, vertex in enumerate(self.get_vertices()):
+        for i, vertex in enumerate(self.vertices):
             if vertex == vertex_name:
                 return i
 
@@ -156,71 +140,29 @@ class Graph:
 
     def generate(self):
         start_time = time.process_time()
+        vertices_valid_for_nbr = self.vertices.copy()
 
-        for i, vertex in enumerate(self.vertices):
-            added_neighbours = [vertex]
+        for vertex in self.vertices:
+            added_vertices = [vertex]
 
-            if vertex['id'] == 0:
-                slice_end = 0
-            else:
-                slice_end = vertex['id']
+            while len(self.adjacencies[vertex]) < self.neighbours_min:
+                random_nbr = random_vertex(vertices_valid_for_nbr, added_vertices)
 
-            while not (self.adjacencies[i].size() > self.neighbours_min):
-                current_neighbours = 0
-
-                for walked_vertex in self.vertices[:slice_end]:
-                    neighbour_to_others = self.adjacencies[walked_vertex['id']].search(vertex)
-                    if neighbour_to_others:
-                        current_neighbours += 1
-
-                current_neighbours += self.adjacencies[i].size() - 1
-
-                if current_neighbours >= self.neighbours_max:
+                if not random_nbr:
                     break
 
-                if len(self.vertices) == len(added_neighbours):
-                    break
+                if vertex in self.adjacencies[random_nbr]:
+                    vertices_valid_for_nbr.remove(random_nbr)
+                elif len(self.adjacencies[random_nbr]) == self.neighbours_max:
+                    vertices_valid_for_nbr.remove(random_nbr)
+                else:
+                    self.adjacencies[vertex].append(random_nbr)
 
-                mirrored_neighbour = False
-                neighbour_neighbours = 0
-                neighbour_occurrences = 0
-
-                random_neighbour = random_vertex(self.vertices, added_neighbours)
-                valid_neighbour = True
-
-                if random_neighbour['id'] < vertex['id']:
-                    neighbour_neighbours = self.adjacencies[random_neighbour['id']].size() - 1
-
-                for walked_vertex in self.vertices[:slice_end]:
-                    mirrored_neighbour = self.adjacencies[random_neighbour['id']].search(vertex)
-                    neighbour_to_others = self.adjacencies[walked_vertex['id']].search(random_neighbour)
-                    if neighbour_to_others:
-                        neighbour_occurrences += 1
-
-                if (mirrored_neighbour
-                        or (neighbour_occurrences + neighbour_neighbours >= self.neighbours_max)):
-                    valid_neighbour = False
-
-                added_neighbours.append(random_neighbour)
-
-                if valid_neighbour:
-                    random_neighbour_cp = random_neighbour.copy()
-                    if self.generate_random_weight:
-                        random_weight = random.randrange(self.generate_random_weight)
-                    else:
-                        random_weight = 1
-
-                    random_neighbour_cp['weight'] = random_weight
-                    random_nbr_id = self.get_vertex_id(random_neighbour_cp['id'])
-                    self.adjacencies[i].insert(random_neighbour_cp)
-                    if not self.is_digraph:
-                        vertex_cp = vertex.copy()
-                        vertex_cp['weight'] = random_weight
-                        self.adjacencies[random_nbr_id].insert(vertex_cp)
+                added_vertices.append(random_nbr)
 
         if self.print_to_stdout:
             for adjacency in self.adjacencies:
-                print(adjacency.get())
+                print(adjacency)
 
         end_time = time.process_time()
         self.graph_io.dump(self.is_digraph, self.adjacencies)
@@ -229,6 +171,7 @@ class Graph:
 
     def load(self):
         self.is_digraph, self.adjacencies = self.graph_io.load()
+        self.vertices = list(range(len(self.adjacencies)))
 
     def draw(self, show_weights):
         if self.is_digraph:
@@ -236,7 +179,7 @@ class Graph:
         else:
             graph = nx.Graph()
 
-        vertices = self.get_vertices()
+        vertices = self.vertices
         edges = self.get_edges()
 
         graph.add_nodes_from(vertices)
@@ -271,7 +214,7 @@ class Graph:
                 self.depth_first_search_visit(neighbour)
 
     def depth_first_search(self, vertex_name, draw):
-        if vertex_name not in self.get_vertices():
+        if vertex_name not in self.vertices:
             print('Vertex "{}" not found in graph.'.format(vertex_name))
             return
 
@@ -318,7 +261,7 @@ class Graph:
         return heap
 
     def search_dijkstra(self, node_from):
-        vertices = self.get_vertices()
+        vertices = self.vertices
         graph = self.get_graph()
         initialized_vertices = initialize_single_source(vertices, node_from)
 
@@ -347,7 +290,7 @@ class Graph:
         return covering_graph
 
     def get_all_shortest_paths(self):
-        vertices = self.get_vertices()
+        vertices = self.vertices
         heap = []
 
         for from_vertex in vertices:
@@ -366,3 +309,8 @@ class Graph:
         heap = Heap().build_min_heap(heap)
         print(heap)
         print('Best place to put gaisrine is at node: {}'.format(heap[0]['id']))
+
+    def approximate_vertex_cover(self):
+        cover = []
+        edges = self.get_edges()
+        return
